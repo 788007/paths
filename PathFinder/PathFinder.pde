@@ -1,28 +1,30 @@
-int screenSize = 500;
 int numCells = 10;
 Grid grid;
-Ball ball = new Ball(10);
+Ball ball;
 
 void setup(){
- size(screenSize, screenSize);
+ size(500, 500);
  background(255);
  noStroke();
- grid = new Grid(numCells, screenSize, screenSize);
+ //frameRate(5);
+ grid = new Grid(numCells);
+ ball = new Ball(10);
  
 }
 
 void draw(){
+  background(255);
   grid.draw();
   ball.draw();
-  //ball.moveForward();
 }
 
 void mouseClicked(){
   GridCell g = grid.cellAt(mouseX, mouseY);
-  if(!g.isBlocked())
-    g.setObstacle();
-   else
-     g.setOpen();
+  if(g.isGoal()){
+    ball.run(grid.getCells());
+  }else if (g.isStart()){
+    ball.reset();
+    grid.reset();
+  }else
+     g.setObstacle();
 }
-
-

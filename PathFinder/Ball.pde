@@ -8,28 +8,72 @@ public class Ball {
    xCoord = 25;
    yCoord = 25;
   }
-  
-  public int getXCoord(){
-    return xCoord;
-  }
-  public int getYCoord(){
-   return yCoord; 
-  }
-  public void moveForward(){
-    int newX = xCoord + screenSize/numCells;
-    while(xCoord < newX){
-      xCoord++;
+ 
+  public void run(GridCell[][] cells){
+    GridCell gc = cells[getRow()][getCol()];
+    ArrayList<GridCell> neighbors;
+    while(!gc.isGoal()){
+      neighbors = gc.getFreeNeighbors(cells);
+      int index = 0;
+      for(int i = 0; i < neighbors.size(); i++){
+        if(neighbors.get(i).getDistance() < neighbors.get(index).getDistance())
+          index = i;
+      }
+      moveTo(neighbors.get(index));
+      gc = neighbors.get(index);
     }
-     
   }
-  public void moveBackward(){
-    xCoord -= screenSize/numCells;
+  
+  private void moveTo(GridCell gc){
+    if(gc.getRow() == this.getRow() && gc.getCol() > this.getCol())
+      moveForward();
+    else if (gc.getRow() == this.getRow() && gc.getCol() < this.getCol())
+      moveBackward();
+    else if (gc.getRow() > this.getRow() && gc.getCol() == this.getCol())
+      moveDown();
+    else if (gc.getRow() < this.getRow() && gc.getCol() == this.getCol())
+      moveUp();
+    draw();
   }
-  public void moveDown(){
-   yCoord += screenSize/numCells; 
+  
+  private void moveForward(){
+   int newX = xCoord + width/numCells;
+   while(xCoord < newX){
+      xCoord++;
+   }
   }
-  public void moveUp(){
-   yCoord -= screenSize/numCells; 
+  private void moveBackward(){
+    int newX = xCoord - width/numCells;
+    while(xCoord > newX){
+      xCoord--;
+   }
+  }
+  private void moveDown(){
+   int newY = yCoord + height/numCells;
+   while(yCoord < newY){
+      yCoord++;
+   } 
+  }
+  private void moveUp(){
+    int newY = yCoord - height/numCells;
+    while(yCoord > newY){
+      yCoord--;
+   } 
+  }
+  
+  private int getRow(){
+   int cellHeight = height/numCells;
+   return(yCoord - cellHeight/2) / cellHeight;
+  }
+  
+  public void reset(){
+     xCoord = 25; 
+     yCoord = 25;
+  }
+  
+  private int getCol(){
+   int cellWidth = width/numCells;
+   return (xCoord - cellWidth/2) / cellWidth;
   }
   
   public void draw(){

@@ -2,21 +2,19 @@ public class Grid {
   private GridCell[][] cells;
   private int rectWidth;
   private int rectHeight;
- // private GridCell start;
-  //private GridCell goal;
 
 
-  public Grid(int numCells, int screenWidth, int screenHeight) {
+  public Grid(int numCells) {
     cells = new GridCell[numCells][numCells];
-    rectWidth = screenWidth/numCells;
-    rectHeight = screenHeight/numCells;
+    rectWidth = width/numCells;
+    rectHeight = height/numCells;
     loadGrid();
     setStart(0, 0);
     setGoal(numCells - 1, numCells -1);
-    loadDistances(cells[numCells - 1][numCells - 1], 0);
+    
   }
 
-  public void loadGrid() {
+  private void loadGrid() {
     int xCoord;
     int yCoord = 0;
     for (int r = 0; r < cells.length; r++) {
@@ -29,18 +27,41 @@ public class Grid {
     }
   }
   
-  public void loadDistances(GridCell gc, int currDist){
-    if(!gc.isStart()){
-      ArrayList<GridCell> neighbors = gc.getFreeNeighbors(cells);
-      for(int i = 0; i < neighbors.size(); i++){
-        neighbors.get(i).setDistance(currDist + 1);
-        loadDistances(neighbors.get(i), currDist + 1);    
+  private void clearDistances(){
+   for(int r = 0; r < cells.length; r++){
+    for(int c = 0; c < cells[0].length; c++){
+     cells[r][c].setDistance(-1); 
+    }
+   }
+ }
+  
+  private void loadDistances(){
+    clearDistances();
+    GridCell goal = cells[cells.length-1][cells[0].length-1];
+    goal.setDistance(0);
+    int currDist = 0;
+    ArrayList<GridCell> cellsToCheck = new ArrayList<GridCell>();
+    cellsToCheck.add(goal);
+    ArrayList<GridCell> neighbors;
+    while(cellsToCheck.size() > 0){
+      ArrayList<GridCell> temp = new ArrayList<GridCell>();
+      for(GridCell currGC : cellsToCheck){
+        neighbors = currGC.getFreeNeighbors(cells);
+        for(GridCell openCell : neighbors){
+          if(openCell.getDistance() == -1){
+           openCell.setDistance(currDist+1); 
+           temp.add(openCell);
+          }
+       }
       }
+      currDist++;
+      cellsToCheck = temp;
     }
     
   }
 
   public void draw() {
+    loadDistances();
     for (int r = 0; r < cells.length; r++) {
       for (int c = 0; c < cells[r].length; c++) {
         cells[r][c].draw();
@@ -54,14 +75,22 @@ public class Grid {
     return cells[rIndex][cIndex];
   }
 
-   public void setStart(int row, int col) {
+  private void setStart(int row, int col) {
     cells[row][col].setStart();
-    //start = cells[row][col];
   }
-  public void setGoal(int row, int col) {
+  private void setGoal(int row, int col) {
     cells[row][col].setGoal();
-    //goal = cells[row][col];
   }
- 
+  public GridCell[][] getCells(){
+    return cells;
+  } 
+  
+  public void reset(){
+    for(int r = 0; r < cells.length; r++){
+     for(int c = 0; c < cells[0].length; c++){
+      cells[r][c].setOpen(); 
+     }
+    }
+    
+  }
 }
-
